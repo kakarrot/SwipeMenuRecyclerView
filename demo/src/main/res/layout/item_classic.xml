@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.aitsuki.swipe.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/slide"
     android:layout_width="match_parent"
     android:layout_height="80dp"
     app:autoClose="true"
@@ -17,23 +18,30 @@
         android:text="LEFT"
         android:textSize="18sp" />
 
-    <TextView
+    <FrameLayout
         android:id="@+id/right_menu"
         android:layout_width="100dp"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        android:background="@color/blue500"
-        android:gravity="center"
-        android:text="RIGHT"
-        android:textSize="18sp" />
+        android:background="@color/orange500"
+        android:textSize="18sp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/blue500"
+            android:layout_marginStart="10dp"
+            android:padding="10dp"
+            android:layout_gravity="center"
+            android:text="RIGHT"/>
+    </FrameLayout>
 
     <TextView
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/white"
         android:gravity="center"
         android:text="Classic"
-        android:background="@color/white"
         android:textSize="18sp" />
 
 </com.aitsuki.swipe.SwipeLayout>

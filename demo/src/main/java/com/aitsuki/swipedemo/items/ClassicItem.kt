@@ -12,7 +12,7 @@ class ClassicItem : BaseItem<ItemClassicBinding>() {
         return ItemClassicBinding.inflate(inflater, parent, false)
     }
 
-    override val bindFun = fun (binding: ItemClassicBinding, position: Int) {
+    override val bindFun = fun(binding: ItemClassicBinding, position: Int) {
         binding.content.text = "Classic $position"
         binding.content.setOnClickListener {
             Toast.makeText(it.context, "Classic $position", Toast.LENGTH_SHORT).show()
@@ -22,6 +22,16 @@ class ClassicItem : BaseItem<ItemClassicBinding>() {
         }
         binding.rightMenu.setOnClickListener {
             Toast.makeText(it.context, "RIGHT $position", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.content.setOnLongClickListener {
+            Toast.makeText(it.context, "LONG press", Toast.LENGTH_SHORT).show()
+            if(binding.slide.isRightMenuOpened()) {
+                binding.slide.closeRightMenu(false)
+            } else {
+                binding.slide.openRightMenu(false)
+            }
+            true
         }
     }
 

@@ -11,7 +11,6 @@ import androidx.core.view.ViewCompat
 import androidx.customview.widget.ViewDragHelper
 import java.lang.reflect.Constructor
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.math.abs
 
 /**
@@ -185,6 +184,7 @@ class SwipeLayout @JvmOverloads constructor(
                 updateMenuState(STATE_IDLE)
             }
         }
+        requestLayout()
         invalidate()
     }
 
@@ -235,7 +235,7 @@ class SwipeLayout @JvmOverloads constructor(
         val dx = ev.x.toInt() - downX
         val dy = ev.y.toInt() - downY
         val isRightDragging = dx > touchSlop && (swipeFlags and RIGHT) != 0 && dx > abs(dy)
-        val isLeftDragging = dx < -touchSlop && (swipeFlags and LEFT) != 0 &&abs(dx) > abs(dy)
+        val isLeftDragging = dx < -touchSlop && (swipeFlags and LEFT) != 0 && abs(dx) > abs(dy)
 
         if (openState and FLAG_IS_OPENED == FLAG_IS_OPENED
             || openState and FLAG_IS_OPENING == FLAG_IS_OPENING
@@ -292,7 +292,7 @@ class SwipeLayout @JvmOverloads constructor(
                     requestDisallowInterceptTouchEvent(false)
                 }
                 if (alwaysInTapRegion) {
-                    closeActiveMenu()
+                    //closeActiveMenu()
                 }
             }
             else -> {
@@ -575,10 +575,11 @@ class SwipeLayout @JvmOverloads constructor(
                 ViewCompat.offsetLeftAndRight(contentView, if (activeMenu == leftMenu) dx else -dx)
             }
 
-            val isRtl = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == LayoutDirection.RTL
+            val isRtl =
+                TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == LayoutDirection.RTL
 
             leftMenu?.let {
-                if(isRtl) {
+                if (isRtl) {
                     designer.onLayout(it, contentView.right, parentTop, parentRight, parentBottom)
                 } else {
                     designer.onLayout(it, parentLeft, parentTop, contentView.left, parentBottom)
@@ -586,7 +587,7 @@ class SwipeLayout @JvmOverloads constructor(
             }
 
             rightMenu?.let {
-                if(isRtl) {
+                if (isRtl) {
                     designer.onLayout(it, parentLeft, parentTop, contentView.left, parentBottom)
                 } else {
                     designer.onLayout(it, contentView.right, parentTop, parentRight, parentBottom)
@@ -788,7 +789,7 @@ class SwipeLayout @JvmOverloads constructor(
                 child.layout(
                     childRight - child.width,
                     child.top,
-                    childRight ,
+                    childRight,
                     child.bottom
                 )
                 prevChild = child
