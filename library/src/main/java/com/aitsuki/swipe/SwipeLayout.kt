@@ -3,11 +3,15 @@ package com.aitsuki.swipe
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.util.LayoutDirection
 import android.view.*
+import androidx.core.text.TextUtilsCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.customview.widget.ViewDragHelper
 import java.lang.reflect.Constructor
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.abs
 
 /**
@@ -571,12 +575,22 @@ class SwipeLayout @JvmOverloads constructor(
                 ViewCompat.offsetLeftAndRight(contentView, if (activeMenu == leftMenu) dx else -dx)
             }
 
+            val isRtl = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == LayoutDirection.RTL
+
             leftMenu?.let {
-                designer.onLayout(it, parentLeft, parentTop, contentView.left, parentBottom)
+                if(isRtl) {
+                    designer.onLayout(it, contentView.right, parentTop, parentRight, parentBottom)
+                } else {
+                    designer.onLayout(it, parentLeft, parentTop, contentView.left, parentBottom)
+                }
             }
 
             rightMenu?.let {
-                designer.onLayout(it, contentView.right, parentTop, parentRight, parentBottom)
+                if(isRtl) {
+                    designer.onLayout(it, parentLeft, parentTop, contentView.left, parentBottom)
+                } else {
+                    designer.onLayout(it, contentView.right, parentTop, parentRight, parentBottom)
+                }
             }
         }
     }

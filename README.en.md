@@ -5,6 +5,7 @@ SwipeMenuRecyclerView is a lightweight sliding menu library，it can be use in t
 - Support multiple styles of menus (Classic, Overlay, Parallax), and easily customize your new styles.
 - Support long menus, you can also slide on menu button.
 - Easily build in layout editor, as simple as build a TextView.
+- Support RTL layout.
 
 https://user-images.githubusercontent.com/14817735/134755455-47c0fbc3-54b0-4899-9dba-dd54f3ddf851.mp4
 
