@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.util.LayoutDirection
+import android.util.Log
 import android.view.*
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.GravityCompat
@@ -68,6 +69,10 @@ class SwipeLayout @JvmOverloads constructor(
     // XXX: Should be independent of swipeFlags, and expose it?
     internal val swipeEnable get() = (swipeFlags and (LEFT or RIGHT)) != 0
 
+    private val isRtl by lazy {
+        TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == ViewCompat.LAYOUT_DIRECTION_RTL
+    }
+
     /**
      * swipeFlags is used to control the swipe direction. If you want to disable the swipe action,
      * set the value to zero.
@@ -103,35 +108,35 @@ class SwipeLayout @JvmOverloads constructor(
 
     fun closeLeftMenu(animate: Boolean = true) {
         val activeMenu = activeMenu ?: return
-        if (activeMenu == leftMenu) {
+        if (activeMenu == (if(isRtl) rightMenu else leftMenu)) {
             closeActiveMenu(animate)
         }
     }
 
     fun closeRightMenu(animate: Boolean = true) {
         val activeMenu = activeMenu ?: return
-        if (activeMenu == rightMenu) {
+        if (activeMenu == (if(isRtl) leftMenu else rightMenu)) {
             closeActiveMenu(animate)
         }
     }
 
     fun isLeftMenuOpened(): Boolean {
         val activeMenu = activeMenu ?: return false
-        return activeMenu == leftMenu && openState and FLAG_IS_OPENED == FLAG_IS_OPENED
+        return activeMenu == (if(isRtl) rightMenu else leftMenu) && openState and FLAG_IS_OPENED == FLAG_IS_OPENED
     }
 
     fun isRightMenuOpened(): Boolean {
         val activeMenu = activeMenu ?: return false
-        return activeMenu == rightMenu && openState and FLAG_IS_OPENED == FLAG_IS_OPENED
+        return activeMenu == (if(isRtl) leftMenu else rightMenu) && openState and FLAG_IS_OPENED == FLAG_IS_OPENED
     }
 
     fun openLeftMenu(animate: Boolean = true) {
-        activeMenu = leftMenu
+        activeMenu = if(isRtl) rightMenu else leftMenu
         openActiveMenu(animate)
     }
 
     fun openRightMenu(animate: Boolean = true) {
-        activeMenu = rightMenu
+        activeMenu = if(isRtl) leftMenu else rightMenu
         openActiveMenu(animate)
     }
 
@@ -161,6 +166,7 @@ class SwipeLayout @JvmOverloads constructor(
                 updateMenuState(STATE_IDLE)
             }
         }
+        requestLayout()
         invalidate()
     }
 
@@ -171,8 +177,11 @@ class SwipeLayout @JvmOverloads constructor(
         }
         val contentView = contentView ?: return
         val activeMenu = activeMenu ?: return
-        val left = if (activeMenu == leftMenu) activeMenu.width + paddingLeft
-        else -activeMenu.width + paddingLeft
+        val left = when(activeMenu) {
+            leftMenu -> activeMenu.width + paddingStart
+            else -> -activeMenu.width + paddingStart
+        }
+
         when {
             animate -> {
                 openState = openState or FLAG_IS_OPENING
@@ -241,7 +250,7 @@ class SwipeLayout @JvmOverloads constructor(
             || openState and FLAG_IS_OPENING == FLAG_IS_OPENING
         ) {
             if (isTouchContent(downX, downY)) {
-                isDragging = true
+                isDragging = isLeftDragging || isRightDragging
             } else if (isTouchMenu(downX, downY)) {
                 isDragging = isLeftDragging || isRightDragging
             }
@@ -320,6 +329,7 @@ class SwipeLayout @JvmOverloads constructor(
 
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         processTouchEvent(ev)
+        Log.e("isDragging", "$isDragging")
         return isDragging
     }
 
@@ -575,23 +585,12 @@ class SwipeLayout @JvmOverloads constructor(
                 ViewCompat.offsetLeftAndRight(contentView, if (activeMenu == leftMenu) dx else -dx)
             }
 
-            val isRtl =
-                TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == LayoutDirection.RTL
-
             leftMenu?.let {
-                if (isRtl) {
-                    designer.onLayout(it, contentView.right, parentTop, parentRight, parentBottom)
-                } else {
-                    designer.onLayout(it, parentLeft, parentTop, contentView.left, parentBottom)
-                }
+                designer.onLayout(it, parentLeft, parentTop, contentView.left, parentBottom)
             }
 
             rightMenu?.let {
-                if (isRtl) {
-                    designer.onLayout(it, parentLeft, parentTop, contentView.left, parentBottom)
-                } else {
-                    designer.onLayout(it, contentView.right, parentTop, parentRight, parentBottom)
-                }
+                designer.onLayout(it, contentView.right, parentTop, parentRight, parentBottom)
             }
         }
     }
